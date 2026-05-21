@@ -1,16 +1,23 @@
 Package: fistcards
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Logic Helpers for the FIST Card Task
 Version: 0.1.0
 Authors@R: c(
     person(
-      "Jane", "Doe",
-      email = "jane@example.com",
+      "Sofija", "Kostic",
+      email = "sofija.kostic@student.uva.nl",
       role = c("aut", "cre")
     )
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: What license is it under?
+Description: Provides helper functions for comparing FIST task cards,
+    identifying correct responses in Phase 1 and Phase 2 trials, and building
+    image paths for visible card stimuli.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Imports:
+    glue
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+RoxygenNote: 7.3.3
