@@ -1,0 +1,121 @@
+---
+title: "FIST Cards Report"
+author: "Sofija Kostic"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FIST Cards Report}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Project aim
+
+The goal of `fistcards` is to create an online version of the FIST card task for
+young children. The task uses cards that vary on three dimensions: colour,
+animal, and number. The package currently provides helper functions for
+representing the card deck, generating valid trials, scoring choices, and
+running a small Shiny app.
+
+This report is a draft for Week 3. The software is still being developed, so
+later versions can add screenshots of the final app, more detail about the task
+procedure, and examples from pilot data.
+
+## Card structure
+
+Each card is described by its colour, animal, number, and image path. The full
+deck has 27 cards: three colours, three animals, and three numbers.
+
+```{r}
+library(fistcards)
+
+cards <- fist_cards()
+nrow(cards)
+head(cards)
+```
+
+## Phase 1
+
+In Phase 1, children see one target card and two possible answer cards. The
+correct answer is the card that shares exactly one dimension with the target
+card. The distractor shares no dimensions with the target. The two answer
+options are also kept visually distinct from each other, so they do not share
+colour, animal, or number.
+
+```{r}
+phase1_trials <- generate_phase1_trials(n = 5, seed = 1)
+phase1_trials
+```
+
+The scoring helper returns the position of the correct choice.
+
+```{r}
+target <- list(colour = "blue", animal = "frog", number = 1)
+choice1 <- list(colour = "yellow", animal = "frog", number = 3)
+choice2 <- list(colour = "red", animal = "snail", number = 2)
+
+correct_phase1_choice(choice1, choice2, target)
+```
+
+## Phase 2
+
+In Phase 2, children see three cards and choose the special card. A valid
+special card shares exactly one dimension with one card and exactly one
+different dimension with the other card. The two non-special cards do not share
+any dimensions with each other.
+
+```{r}
+phase2_trials <- generate_phase2_trials(n = 5, seed = 1)
+phase2_trials
+```
+
+The scoring helper returns which of the three cards is the special card.
+
+```{r}
+card1 <- list(colour = "red", animal = "frog", number = 1)
+card2 <- list(colour = "blue", animal = "frog", number = 2)
+card3 <- list(colour = "red", animal = "snail", number = 3)
+
+correct_phase2_choice(card1, card2, card3)
+```
+
+## Shiny app
+
+The interactive version can be launched from R:
+
+```{r, eval = FALSE}
+devtools::load_all("fistcards")
+run_fist_game()
+```
+
+The app currently includes:
+
+- a participant ID field
+- configurable trial counts for Phase 1 and Phase 2
+- introductory example screens before each phase
+- clickable card choices
+- response recording with accuracy and reaction time
+- CSV download at the end
+
+## Testing and continuous integration
+
+The package uses `testthat` unit tests for the card logic, trial generators, and
+image assets. The Week 3 branch also adds a GitHub Actions workflow that should
+run R CMD check on every push and pull request.
+
+Locally, the tests can be run with:
+
+```{r, eval = FALSE}
+devtools::test("fistcards")
+```
+
+## Next steps
+
+Planned next steps are to polish the child-facing wording, add final screenshots
+to this report, and verify the workflow after opening the Week 3 pull request.

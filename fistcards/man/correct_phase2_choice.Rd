@@ -14,11 +14,13 @@ correct_phase2_choice(card1, card2, card3)
 \item{card3}{A named list with card features.}
 }
 \value{
-`1`, `2`, or `3` for the card that shares something with both other cards,
+`1`, `2`, or `3` for the card that matches both other cards,
   or `NA` if no card matches the Phase 2 rule.
 }
 \description{
-Finds which card shares at least one feature with each of the other two cards.
+Finds which card shares exactly one feature with each of the other two cards.
+The two shared features must be different, and the two non-special cards must
+not share a feature with each other.
 }
 \examples{
 card1 <- list(colour = "red", animal = "frog", number = 1)

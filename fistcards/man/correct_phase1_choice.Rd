@@ -17,7 +17,7 @@ correct_phase1_choice(card1, card2, card3)
 `1` if `card1` matches `card3`, `2` if `card2` matches `card3`, or `NA` if neither card matches.
 }
 \description{
-Finds which of the first two cards shares at least one feature with the third card.
+Finds which of the first two cards shares exactly one feature with the third card.
 }
 \examples{
 card1 <- list(colour = "red", animal = "frog", number = 1)
