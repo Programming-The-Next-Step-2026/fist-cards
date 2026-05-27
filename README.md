@@ -1,4 +1,22 @@
 # fist-cards
+
+Online version containing Phase 1 and 2 of the FIST card task for young children
+
+## Week 3 game work
+
+This branch adds the cropped FIST cards as app assets and includes helpers for
+creating valid Phase 1 and Phase 2 trials.
+
+From R, run the game with:
+
+```r
+devtools::load_all("fistcards")
+run_fist_game()
+```
+
+The Shiny app records participant ID, phase, trial number, shown cards, selected
+choice, accuracy, reaction time, and timestamp. Results can be downloaded as a
+CSV at the end of the game.
 This is the online version of the Flexible Item Selection Task (FIST; Jacques & Zelazo, 2001; Schäfer et al., 2024) which can be used to measure cognitive flexibility in children between 2 and 7 years of age. The FIST consists of a one-commonality phase and a two-commonality phase, where each phase contains an introductory trial and 9 test trials. 
 
 In the first phase, children are presented with two pictures that share a single visual property. This property can be color (red, blue, yellow), number (one, two, three), or shape (frog, snail, rabbit), and is explicitly indicated to the child. A third picture was then presented, and the child is asked to select which of the initial two pictures shares a new common property with it. 

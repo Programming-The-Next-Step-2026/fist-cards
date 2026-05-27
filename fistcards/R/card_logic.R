@@ -21,7 +21,7 @@ shared_features <- function(card_a, card_b, features = c("colour", "animal", "nu
 
 #' Find the correct Phase 1 choice
 #'
-#' Finds which of the first two cards shares at least one feature with the third card.
+#' Finds which of the first two cards shares exactly one feature with the third card.
 #'
 #' @param card1 A named list with card features.
 #' @param card2 A named list with card features.
@@ -39,9 +39,9 @@ correct_phase1_choice <- function(card1, card2, card3) {
   shared_with_1 <- shared_features(card1, card3)
   shared_with_2 <- shared_features(card2, card3)
 
-  if (length(shared_with_1) > 0) {
+  if (length(shared_with_1) == 1) {
     1
-  } else if (length(shared_with_2) > 0) {
+  } else if (length(shared_with_2) == 1) {
     2
   } else {
     NA
@@ -50,13 +50,15 @@ correct_phase1_choice <- function(card1, card2, card3) {
 
 #' Find the correct Phase 2 choice
 #'
-#' Finds which card shares at least one feature with each of the other two cards.
+#' Finds which card shares exactly one feature with each of the other two cards.
+#' The two shared features must be different, and the two non-special cards must
+#' not share a feature with each other.
 #'
 #' @param card1 A named list with card features.
 #' @param card2 A named list with card features.
 #' @param card3 A named list with card features.
 #'
-#' @return `1`, `2`, or `3` for the card that shares something with both other cards,
+#' @return `1`, `2`, or `3` for the card that matches both other cards,
 #'   or `NA` if no card matches the Phase 2 rule.
 #' @export
 #'
@@ -66,36 +68,24 @@ correct_phase1_choice <- function(card1, card2, card3) {
 #' card3 <- list(colour = "red", animal = "snail", number = 3)
 #' correct_phase2_choice(card1, card2, card3)
 correct_phase2_choice <- function(card1, card2, card3) {
-  shares_with_both <- c(
-    length(shared_features(card1, card2)) > 0 && length(shared_features(card1, card3)) > 0,
-    length(shared_features(card2, card1)) > 0 && length(shared_features(card2, card3)) > 0,
-    length(shared_features(card3, card1)) > 0 && length(shared_features(card3, card2)) > 0
-  )
+  cards <- list(card1, card2, card3)
 
-  matches <- which(shares_with_both)
+  matches <- which(vapply(seq_along(cards), function(index) {
+    other_indexes <- setdiff(seq_along(cards), index)
+    shared_with_first <- shared_features(cards[[index]], cards[[other_indexes[1]]])
+    shared_with_second <- shared_features(cards[[index]], cards[[other_indexes[2]]])
+    shared_between_others <- shared_features(cards[[other_indexes[1]]], cards[[other_indexes[2]]])
+
+    length(shared_with_first) == 1 &&
+      length(shared_with_second) == 1 &&
+      !identical(shared_with_first, shared_with_second) &&
+      length(shared_between_others) == 0
+  }, logical(1))
+  )
 
   if (length(matches) == 1) {
     matches
   } else {
     NA
   }
-}
-
-#' Create a card image path
-#'
-#' Creates the image path for a card from its colour, animal, and number.
-#'
-#' @param card A named list with colour, animal, and number features.
-#' @param folder The folder where card images are stored.
-#' @param extension The image file extension.
-#'
-#' @return A character string with the image path.
-#' @importFrom glue glue
-#' @export
-#'
-#' @examples
-#' card <- list(colour = "red", animal = "frog", number = 2)
-#' card_image_path(card)
-card_image_path <- function(card, folder = "cards", extension = "png") {
-  as.character(glue("{folder}/{card$colour}_{card$animal}_{card$number}.{extension}"))
 }
