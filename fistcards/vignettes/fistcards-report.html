@@ -350,8 +350,8 @@ FIST card task. It defines the stimulus deck, generates valid Phase 1
 and Phase 2 trials, scores responses, and runs a Shiny app for
 collecting participant data.</p>
 <p>The goal of the project is to create a reusable research tool for
-measuring cognitive flexibility in young children (2-7 years old). In
-the task, children compare cards that vary on three dimensions: colour,
+measuring cognitive flexibility in young children aged 2 to 7. In the
+task, children compare cards that vary on three dimensions: colour,
 animal, and number. The online version makes it possible to present the
 task interactively, record structured responses, and keep the task logic
 in testable R functions.</p>
@@ -366,7 +366,7 @@ images, tests, and documentation can be installed and reused
 together.</p>
 <ul>
 <li><code>R/cards.R</code> creates the card deck, image paths, and card
-look-up helper.</li>
+lookup helper.</li>
 <li><code>R/card_logic.R</code> compares cards and identifies correct
 choices.</li>
 <li><code>R/trials.R</code> generates valid trials for both task
@@ -438,7 +438,7 @@ each other, so they do not share colour, animal, or number.</p>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">correct_phase1_choice</span>(choice1, choice2, target)</span>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span></code></pre></div>
 <p>The target card here is the “one blue frog”. The “three yellow frogs”
-card is correct because it shares animal only with the target, while the
+card is correct because it shares only animal with the target, while the
 “two red snails” card shares no features with the target. In the example
 below, the target card is shown above the two answer options. The blue
 outline marks the correct answer.</p>

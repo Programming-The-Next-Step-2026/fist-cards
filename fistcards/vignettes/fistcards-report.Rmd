@@ -56,7 +56,7 @@ It defines the stimulus deck, generates valid Phase 1 and Phase 2 trials, scores
 responses, and runs a Shiny app for collecting participant data.
 
 The goal of the project is to create a reusable research tool for measuring
-cognitive flexibility in young children (2-7 years old). In the task, children
+cognitive flexibility in young children aged 2 to 7. In the task, children
 compare cards that vary on three dimensions: colour, animal, and number. The
 online version makes it possible to present the task interactively, record
 structured responses, and keep the task logic in testable R functions.
@@ -70,7 +70,7 @@ main logic.
 The project is organized as an R package so that the task logic, app, images,
 tests, and documentation can be installed and reused together.
 
-- `R/cards.R` creates the card deck, image paths, and card look-up helper.
+- `R/cards.R` creates the card deck, image paths, and card lookup helper.
 - `R/card_logic.R` compares cards and identifies correct choices.
 - `R/trials.R` generates valid trials for both task phases.
 - `R/run_fist_game.R` launches the packaged Shiny app.
@@ -135,7 +135,7 @@ correct_phase1_choice(choice1, choice2, target)
 ```
 
 The target card here is the "one blue frog". The "three yellow frogs" card is
-correct because it shares animal only with the target, while the "two red
+correct because it shares only animal with the target, while the "two red
 snails" card shares no features with the target. In the example below, the
 target card is shown above the two answer options. The blue outline marks the
 correct answer.
