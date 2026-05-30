@@ -7,11 +7,11 @@
 correct_phase2_choice(card1, card2, card3)
 }
 \arguments{
-\item{card1}{A named list with card features.}
+\item{card1}{A named list or one-row data frame for the first card.}
 
-\item{card2}{A named list with card features.}
+\item{card2}{A named list or one-row data frame for the second card.}
 
-\item{card3}{A named list with card features.}
+\item{card3}{A named list or one-row data frame for the third card.}
 }
 \value{
 `1`, `2`, or `3` for the card that matches both other cards,
@@ -23,8 +23,8 @@ The two shared features must be different, and the two non-special cards must
 not share a feature with each other.
 }
 \examples{
-card1 <- list(colour = "red", animal = "frog", number = 1)
-card2 <- list(colour = "blue", animal = "frog", number = 2)
-card3 <- list(colour = "red", animal = "snail", number = 3)
-correct_phase2_choice(card1, card2, card3)
+special_card <- list(colour = "red", animal = "frog", number = 1)
+animal_match <- list(colour = "blue", animal = "frog", number = 2)
+colour_match <- list(colour = "red", animal = "snail", number = 3)
+correct_phase2_choice(special_card, animal_match, colour_match)
 }

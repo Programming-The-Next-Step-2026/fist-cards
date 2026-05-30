@@ -7,20 +7,25 @@
 shared_features(card_a, card_b, features = c("colour", "animal", "number"))
 }
 \arguments{
-\item{card_a}{A named list with card features, such as colour, animal, and number.}
+\item{card_a}{A named list or one-row data frame with card features, such as
+colour, animal, and number.}
 
-\item{card_b}{A named list with card features, such as colour, animal, and number.}
+\item{card_b}{A named list or one-row data frame with card features, such as
+colour, animal, and number.}
 
 \item{features}{A character vector with the feature names to compare.}
 }
 \value{
-A character vector with the names of the shared features.
+A character vector with the names of the shared features. Returns
+  `character(0)` when no requested features match.
 }
 \description{
-Compares two cards and returns the names of the features they have in common.
+Compares two cards and returns the names of the requested features they have
+in common. Image paths and card IDs are ignored unless they are explicitly
+included in `features`.
 }
 \examples{
-card1 <- list(colour = "red", animal = "frog", number = 2)
-card2 <- list(colour = "red", animal = "snail", number = 3)
-shared_features(card1, card2)
+frog_card <- list(colour = "red", animal = "frog", number = 2)
+snail_card <- list(colour = "red", animal = "snail", number = 3)
+shared_features(frog_card, snail_card)
 }

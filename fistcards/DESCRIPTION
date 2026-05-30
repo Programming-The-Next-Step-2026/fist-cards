@@ -14,13 +14,14 @@ Description: Provides helper functions for comparing FIST task cards,
     image paths for visible card stimuli.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Imports:
-    glue
+    glue,
+    shiny
 Suggests:
+    pkgload,
     knitr,
     rmarkdown,
-    shiny,
+    shinytest2,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3

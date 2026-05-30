@@ -1,43 +1,21 @@
 library(shiny)
 library(fistcards)
 
+# Setup helpers
 card_deck <- fist_cards()
-trial_columns <- c(
-  "phase", "trial_id", "target_id", "choice1_id", "choice2_id",
-  "card1_id", "card2_id", "card3_id", "correct_choice"
-)
+trial_columns <- fistcards:::trial_columns
+build_trials <- fistcards:::build_trials
+valid_trial_count <- fistcards:::valid_trial_count
+sanitize_csv_text <- fistcards:::sanitize_csv_text
+results_summary <- fistcards:::results_summary
+empty_results <- fistcards:::empty_results
 
-build_trials <- function(phase1_n, phase2_n) {
-  phase1_trials <- generate_phase1_trials(n = phase1_n)
-  phase2_trials <- generate_phase2_trials(n = phase2_n)
-
-  phase1_trials$card1_id <- NA_character_
-  phase1_trials$card2_id <- NA_character_
-  phase1_trials$card3_id <- NA_character_
-  phase2_trials$target_id <- NA_character_
-  phase2_trials$choice1_id <- NA_character_
-  phase2_trials$choice2_id <- NA_character_
-
-  rbind(
-    phase1_trials[, trial_columns],
-    phase2_trials[, trial_columns]
-  )
-}
-
-valid_trial_count <- function(value) {
-  count <- suppressWarnings(as.integer(value))
-
-  if (length(count) == 0L || is.na(count)) {
-    return(0L)
-  }
-
-  max(0L, count)
-}
-
+# Look up one card from the package deck by its generated ID.
 card_by_id <- function(id) {
   card_deck[card_deck$id == id, , drop = FALSE]
 }
 
+# Render a card image as a clickable answer button.
 card_button <- function(input_id, card) {
   actionButton(
     input_id,
@@ -47,6 +25,7 @@ card_button <- function(input_id, card) {
   )
 }
 
+# Render a non-clickable example card for instruction screens.
 demo_card <- function(card, label = NULL, highlight = FALSE) {
   classes <- if (highlight) "demo-card demo-card-correct" else "demo-card"
   div(
@@ -56,22 +35,7 @@ demo_card <- function(card, label = NULL, highlight = FALSE) {
   )
 }
 
-empty_results <- function() {
-  data.frame(
-    participant_id = character(),
-    phase = integer(),
-    trial_id = character(),
-    trial_number = integer(),
-    cards_shown = character(),
-    correct_choice = integer(),
-    chosen_choice = integer(),
-    accuracy = logical(),
-    reaction_time = numeric(),
-    timestamp = character(),
-    stringsAsFactors = FALSE
-  )
-}
-
+# UI
 ui <- fluidPage(
   tags$head(
     tags$style(HTML("
@@ -83,8 +47,18 @@ ui <- fluidPage(
 
       .app-shell {
         max-width: 980px;
+        min-height: 100vh;
         margin: 0 auto;
         padding: 24px 16px 40px;
+      }
+
+      .trial-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: calc(100vh - 64px);
+        transform: translateY(3vh);
+        width: 100%;
       }
 
       .top-row {
@@ -111,7 +85,7 @@ ui <- fluidPage(
         display: flex;
         gap: 22px;
         justify-content: center;
-        margin: 24px 0;
+        margin: 18px 0;
       }
 
       .target-card {
@@ -178,7 +152,8 @@ ui <- fluidPage(
 
       .demo-card-correct {
         border-color: #0b6bcb;
-        box-shadow: 0 0 0 4px rgba(11, 107, 203, 0.18);
+        box-shadow: 0 0 0 5px rgba(11, 107, 203, 0.24), 0 4px 0 #0b6bcb;
+        transform: translateY(-2px);
       }
 
       .demo-card img {
@@ -212,6 +187,38 @@ ui <- fluidPage(
 
       .primary-action {
         margin-top: 14px;
+      }
+
+      .helper-text {
+        color: #555;
+        font-size: 15px;
+        line-height: 1.4;
+        margin-top: -6px;
+      }
+
+      .summary-box {
+        background: #fff;
+        border: 2px solid #222;
+        border-radius: 8px;
+        margin: 18px 0;
+        padding: 16px;
+      }
+
+      .summary-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .summary-number {
+        display: block;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .summary-label {
+        color: #555;
+        font-size: 13px;
       }
 
       @media (max-width: 700px) {
@@ -248,6 +255,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
+  # Server state
   started <- reactiveVal(FALSE)
   complete <- reactiveVal(FALSE)
   screen_mode <- reactiveVal("start")
@@ -256,7 +264,9 @@ server <- function(input, output, session) {
   trial_started_at <- reactiveVal(Sys.time())
   active_trials <- reactiveVal(build_trials(8, 8))
   results <- reactiveVal(empty_results())
+  accepting_response <- reactiveVal(FALSE)
 
+  # Event handlers
   observeEvent(input$start, {
     phase1_n <- valid_trial_count(input$phase1_trials)
     phase2_n <- valid_trial_count(input$phase2_trials)
@@ -270,22 +280,30 @@ server <- function(input, output, session) {
     } else if (phase2_n > 0L) {
       "phase2_intro"
     } else {
-      "done"
+      "thanks"
     })
     trial_index(1L)
     results(empty_results())
+    accepting_response(FALSE)
   })
 
   observeEvent(input$begin_phase1, {
     screen_mode("trial")
     trial_started_at(Sys.time())
+    accepting_response(TRUE)
   })
 
   observeEvent(input$begin_phase2, {
     screen_mode("trial")
     trial_started_at(Sys.time())
+    accepting_response(TRUE)
   })
 
+  observeEvent(input$view_results, {
+    screen_mode("results")
+  })
+
+  # The current row decides which cards and correct answer are shown.
   current_trial <- reactive({
     active_trials()[trial_index(), , drop = FALSE]
   })
@@ -299,10 +317,15 @@ server <- function(input, output, session) {
   }
 
   record_choice <- function(choice) {
+    if (!isTRUE(accepting_response()) || screen_mode() != "trial" || complete()) {
+      return(invisible(NULL))
+    }
+
+    accepting_response(FALSE)
     trial <- current_trial()
     timestamp <- Sys.time()
     response <- data.frame(
-      participant_id = participant_id(),
+      participant_id = sanitize_csv_text(participant_id()),
       phase = trial$phase,
       trial_id = trial$trial_id,
       trial_number = trial_index(),
@@ -319,6 +342,7 @@ server <- function(input, output, session) {
 
     if (trial_index() >= nrow(active_trials())) {
       complete(TRUE)
+      screen_mode("thanks")
     } else {
       next_index <- trial_index() + 1L
       next_trial <- active_trials()[next_index, , drop = FALSE]
@@ -328,6 +352,7 @@ server <- function(input, output, session) {
         screen_mode("phase2_intro")
       } else {
         trial_started_at(Sys.time())
+        accepting_response(TRUE)
       }
     }
   }
@@ -336,12 +361,17 @@ server <- function(input, output, session) {
   observeEvent(input$choice2, record_choice(2L))
   observeEvent(input$choice3, record_choice(3L))
 
+  # Screen rendering
   output$screen <- renderUI({
     if (!started()) {
       return(div(
         class = "start-panel",
         h1("FIST Cards"),
         textInput("participant_id", "Participant ID", value = ""),
+        div(
+          class = "helper-text",
+          "Use the anonymous ID assigned by the researcher."
+        ),
         div(
           class = "trial-counts",
           numericInput("phase1_trials", "First game trials", value = 8, min = 0, step = 1),
@@ -361,6 +391,7 @@ server <- function(input, output, session) {
         h1("First game"),
         p("Look at the card on top."),
         p("Pick the card below that is the same in only one way: colour, animal, or number."),
+        p("The blue outline marks the correct card in this example."),
         div(class = "demo-row", demo_card(target, "Look at this card")),
         div(
           class = "demo-row",
@@ -382,6 +413,7 @@ server <- function(input, output, session) {
         h1("Second game"),
         p("Now find the card that goes with both other cards."),
         p("The answer matches one card in one way, and the other card in a different way."),
+        p("The blue outline marks the correct card in this example."),
         div(
           class = "demo-row",
           demo_card(special, "Pick this one", highlight = TRUE),
@@ -393,10 +425,39 @@ server <- function(input, output, session) {
       ))
     }
 
-    if (complete()) {
+    if (complete() && screen_mode() != "results") {
       return(div(
         class = "done-panel",
         h1("Finished"),
+        p("Thank you for your participation."),
+        actionButton("view_results", "Next", class = "btn-primary primary-action")
+      ))
+    }
+
+    if (complete()) {
+      summary <- results_summary(results())
+      return(div(
+        class = "done-panel",
+        h1("Results"),
+        div(
+          class = "summary-box",
+          h3("Results summary"),
+          div(
+            class = "summary-grid",
+            div(
+              span(class = "summary-number", paste0(summary$correct, "/", summary$total)),
+              span(class = "summary-label", "Correct")
+            ),
+            div(
+              span(class = "summary-number", if (is.na(summary$percent)) "NA" else paste0(summary$percent, "%")),
+              span(class = "summary-label", "Accuracy")
+            ),
+            div(
+              span(class = "summary-number", if (is.na(summary$mean_rt)) "NA" else paste0(summary$mean_rt, "s")),
+              span(class = "summary-label", "Mean response time")
+            )
+          )
+        ),
         downloadButton("download_results", "Download results")
       ))
     }
@@ -408,7 +469,8 @@ server <- function(input, output, session) {
       choice1 <- card_by_id(trial$choice1_id)
       choice2 <- card_by_id(trial$choice2_id)
 
-      return(tagList(
+      return(div(
+        class = "trial-panel",
         div(
           class = "top-row",
           h2(class = "trial-title", "Find the card that goes with this one"),
@@ -430,7 +492,8 @@ server <- function(input, output, session) {
     card2 <- card_by_id(trial$card2_id)
     card3 <- card_by_id(trial$card3_id)
 
-    tagList(
+    div(
+      class = "trial-panel",
       div(
         class = "top-row",
         h2(class = "trial-title", "Find the card that goes with both others"),
@@ -445,6 +508,7 @@ server <- function(input, output, session) {
     )
   })
 
+  # Downloads
   output$download_results <- downloadHandler(
     filename = function() {
       paste0("fist_results_", format(Sys.Date(), "%Y%m%d"), ".csv")

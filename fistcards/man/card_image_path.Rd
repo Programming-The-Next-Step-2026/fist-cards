@@ -7,7 +7,8 @@
 card_image_path(card, folder = "cards", extension = "png")
 }
 \arguments{
-\item{card}{A named list with colour, animal, and number features.}
+\item{card}{A named list or one-row data frame with `colour`, `animal`, and
+`number` features.}
 
 \item{folder}{The folder where card images are stored.}
 
@@ -17,7 +18,9 @@ card_image_path(card, folder = "cards", extension = "png")
 A character string with the image path.
 }
 \description{
-Creates the image path for a card from its colour, animal, and number.
+Creates the image path for a card from its colour, animal, and number. The
+path is relative to the Shiny app's `www` directory when the default folder
+is used.
 }
 \examples{
 card <- list(colour = "red", animal = "frog", number = 2)

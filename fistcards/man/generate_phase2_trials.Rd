@@ -9,18 +9,23 @@ generate_phase2_trials(cards = fist_cards(), n = NULL, seed = NULL)
 \arguments{
 \item{cards}{A card metadata data frame, such as `fist_cards()`.}
 
-\item{n}{Optional number of trials to sample.}
+\item{n}{Optional number of trials to sample. If `NULL`, all valid trials are
+returned.}
 
 \item{seed}{Optional random seed used when sampling trials.}
 }
 \value{
-A data frame of Phase 2 trials.
+A data frame with columns `phase`, `trial_id`, `card1_id`,
+  `card2_id`, `card3_id`, and `correct_choice`.
 }
 \description{
-Creates valid Phase 2 trials. Each trial has three cards and exactly one
-card that shares exactly one feature with each of the other two cards.
+Creates valid Phase 2 trials. Each trial has three cards and exactly one card
+that shares exactly one feature with each of the other two cards. The shared
+feature must be different for each pair, and the two non-special cards must
+not match each other.
 }
 \examples{
 trials <- generate_phase2_trials(n = 10, seed = 1)
 nrow(trials)
+head(trials)
 }
