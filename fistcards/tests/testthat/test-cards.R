@@ -31,6 +31,14 @@ test_that("find_card returns one requested card", {
   expect_equal(card$id, "yellow_snail_3")
 })
 
+test_that("find_card requires one value per feature", {
+  expect_error(
+    find_card(c("blue", "red"), "frog", 1),
+    "must each be a single value",
+    fixed = TRUE
+  )
+})
+
 test_that("generate_phase1_trials creates trials with exactly one correct choice", {
   trials <- generate_phase1_trials(n = 25, seed = 123)
   cards <- fist_cards()
@@ -40,9 +48,9 @@ test_that("generate_phase1_trials creates trials with exactly one correct choice
 
   for (index in seq_len(nrow(trials))) {
     trial <- trials[index, ]
-    target <- card_row(cards, which(cards$id == trial$target_id))
-    choice1 <- card_row(cards, which(cards$id == trial$choice1_id))
-    choice2 <- card_row(cards, which(cards$id == trial$choice2_id))
+    target <- cards[cards$id == trial$target_id, , drop = FALSE]
+    choice1 <- cards[cards$id == trial$choice1_id, , drop = FALSE]
+    choice2 <- cards[cards$id == trial$choice2_id, , drop = FALSE]
 
     expect_equal(correct_phase1_choice(choice1, choice2, target), trial$correct_choice)
     expect_equal(shared_feature_count(list(choice1, choice2)[[trial$correct_choice]], target), 1)
@@ -57,13 +65,23 @@ test_that("generate_phase1_trials avoids visually similar option pairs", {
 
   for (index in seq_len(nrow(trials))) {
     trial <- trials[index, ]
-    choice1 <- card_row(cards, which(cards$id == trial$choice1_id))
-    choice2 <- card_row(cards, which(cards$id == trial$choice2_id))
+    choice1 <- cards[cards$id == trial$choice1_id, , drop = FALSE]
+    choice2 <- cards[cards$id == trial$choice2_id, , drop = FALSE]
 
     expect_false(identical(choice1$animal, choice2$animal))
     expect_false(identical(choice1$colour, choice2$colour))
     expect_false(identical(choice1$number, choice2$number))
   }
+})
+
+test_that("generate_phase1_trials handles empty and invalid requests clearly", {
+  expect_equal(nrow(generate_phase1_trials(cards = fist_cards()[0, ], n = 0)), 0)
+  expect_error(generate_phase1_trials(n = -1), "non-negative", fixed = TRUE)
+  expect_error(
+    generate_phase1_trials(cards = data.frame(id = character())),
+    "cards must contain columns",
+    fixed = TRUE
+  )
 })
 
 test_that("generate_phase2_trials creates trials with exactly one special card", {
@@ -75,9 +93,9 @@ test_that("generate_phase2_trials creates trials with exactly one special card",
 
   for (index in seq_len(nrow(trials))) {
     trial <- trials[index, ]
-    card1 <- card_row(cards, which(cards$id == trial$card1_id))
-    card2 <- card_row(cards, which(cards$id == trial$card2_id))
-    card3 <- card_row(cards, which(cards$id == trial$card3_id))
+    card1 <- cards[cards$id == trial$card1_id, , drop = FALSE]
+    card2 <- cards[cards$id == trial$card2_id, , drop = FALSE]
+    card3 <- cards[cards$id == trial$card3_id, , drop = FALSE]
 
     expect_equal(correct_phase2_choice(card1, card2, card3), trial$correct_choice)
 
@@ -92,4 +110,14 @@ test_that("generate_phase2_trials creates trials with exactly one special card",
     expect_false(identical(shared_with_first, shared_with_second))
     expect_equal(shared_feature_count(other_cards[[1]], other_cards[[2]]), 0)
   }
+})
+
+test_that("generate_phase2_trials handles too-small and invalid requests clearly", {
+  expect_equal(nrow(generate_phase2_trials(cards = fist_cards()[1:2, ], n = 0)), 0)
+  expect_error(generate_phase2_trials(n = -1), "non-negative", fixed = TRUE)
+  expect_error(
+    generate_phase2_trials(cards = data.frame(id = character())),
+    "cards must contain columns",
+    fixed = TRUE
+  )
 })

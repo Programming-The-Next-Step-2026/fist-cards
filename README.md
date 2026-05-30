@@ -1,30 +1,72 @@
-# fist-cards
+# FIST-cards
 
-Online version containing Phase 1 and 2 of the FIST card task for young children
+Online version containing Phase 1 and Phase 2 of the FIST (Flexible Item Selection Task) card task for young
+children.
 
-## Week 3 game work
+The project is organized as an R package with a Shiny app. It includes helper
+functions for creating the card deck, generating valid trials, checking correct
+answers, running the app, and exporting participant results.
 
-This branch adds the cropped FIST cards as app assets and includes helpers for
-creating valid Phase 1 and Phase 2 trials.
+## What the app does
 
-From R, run the game with:
+- Shows Phase 1 trials where the participant matches one card to a target card.
+- Shows Phase 2 trials where the participant finds the card that matches both
+  other cards in different ways.
+- Records participant ID, phase, trial number, cards shown, selected choice,
+  accuracy, reaction time, and timestamp.
+- Shows a thank-you screen at the end of the game.
+- Shows a results summary and lets the researcher download the full CSV.
+
+## Installation
+
+Install the package from GitHub with:
+
+```r
+install.packages("remotes")
+remotes::install_github(
+  "Programming-The-Next-Step-2026/fist-cards",
+  subdir = "fistcards"
+)
+```
+
+## Running the App
+
+Run the game from R with:
+
+```r
+library(fistcards)
+run_fist_game()
+```
+
+If you already downloaded the repository and are working from the repository
+root, you can load the local package during development with:
 
 ```r
 devtools::load_all("fistcards")
 run_fist_game()
 ```
 
-The Shiny app records participant ID, phase, trial number, shown cards, selected
-choice, accuracy, reaction time, and timestamp. Results can be downloaded as a
-CSV at the end of the game.
-This is the online version of the Flexible Item Selection Task (FIST; Jacques & Zelazo, 2001; Schäfer et al., 2024) which can be used to measure cognitive flexibility in children between 2 and 7 years of age. The FIST consists of a one-commonality phase and a two-commonality phase, where each phase contains an introductory trial and 9 test trials. 
+## Project Structure
 
-In the first phase, children are presented with two pictures that share a single visual property. This property can be color (red, blue, yellow), number (one, two, three), or shape (frog, snail, rabbit), and is explicitly indicated to the child. A third picture was then presented, and the child is asked to select which of the initial two pictures shares a new common property with it. 
+- `fistcards/R/cards.R`: card metadata and image paths.
+- `fistcards/R/card_logic.R`: Phase 1 and Phase 2 matching rules.
+- `fistcards/R/trials.R`: valid trial generation.
+- `fistcards/R/run_fist_game.R`: package function for launching the Shiny app.
+- `fistcards/inst/app/app.R`: Shiny user interface and server logic.
+- `fistcards/inst/app/www/cards/`: card image assets.
+- `fistcards/tests/testthat/`: unit tests and Shiny click-through tests.
+- `fistcards/vignettes/`: project report materials.
 
-In the second phase, children are presented with three pictures. They are then asked to select one picture that shares one common property with each of the two remaining pictures. 
+## Testing
 
-## References
+Run the test suite with:
 
-Jacques, S., & Zelazo, P. D. (2001). The Flexible Item Selection Task (FIST): A measure of executive function in preschoolers. Developmental Neuropsychology, 20(3), 573–591. https://doi.org/10.1207/s15326942dn2003_2
+```r
+devtools::test("fistcards")
+```
 
-Schäfer, J., Reuter, T., Leuchter, M., & Karbach, J. (2024). Executive functions and problem-solving—The contribution of inhibition, working memory, and cognitive flexibility to science problem-solving performance in elementary school students. Journal of Experimental Child Psychology, 244, 105962. https://doi.org/10.1016/j.jecp.2024.105962
+Run the full package check, including the vignette, with:
+
+```r
+devtools::check("fistcards")
+```

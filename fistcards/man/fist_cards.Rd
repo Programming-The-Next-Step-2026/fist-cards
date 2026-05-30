@@ -7,15 +7,20 @@
 fist_cards(image_folder = "cards")
 }
 \arguments{
-\item{image_folder}{Folder path used in the image column.}
+\item{image_folder}{Folder path used in the image column. The default
+`"cards"` matches the Shiny app asset directory.}
 }
 \value{
-A data frame with one row per card.
+A data frame with one row per card and columns `id`, `colour`,
+  `animal`, `number`, and `image`.
 }
 \description{
-Creates metadata for the full set of FIST cards used by the game.
+Creates metadata for the full set of FIST cards used by the game. The deck
+contains every combination of three colours, three animals, and three
+numbers, for 27 cards in total.
 }
 \examples{
 cards <- fist_cards()
 nrow(cards)
+head(cards)
 }

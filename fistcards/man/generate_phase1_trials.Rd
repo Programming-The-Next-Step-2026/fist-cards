@@ -9,19 +9,23 @@ generate_phase1_trials(cards = fist_cards(), n = NULL, seed = NULL)
 \arguments{
 \item{cards}{A card metadata data frame, such as `fist_cards()`.}
 
-\item{n}{Optional number of trials to sample.}
+\item{n}{Optional number of trials to sample. If `NULL`, all valid trials are
+returned.}
 
 \item{seed}{Optional random seed used when sampling trials.}
 }
 \value{
-A data frame of Phase 1 trials.
+A data frame with columns `phase`, `trial_id`, `target_id`,
+  `choice1_id`, `choice2_id`, and `correct_choice`.
 }
 \description{
-Creates valid Phase 1 trials. Each trial has a target card, two choices,
-and exactly one choice that shares exactly one feature with the target. The
-two choice cards do not share any dimensions with each other.
+Creates valid Phase 1 trials. Each trial has a target card, two choices, and
+exactly one choice that shares exactly one feature with the target. The other
+choice shares no features with the target, and the two choice cards do not
+share any dimensions with each other.
 }
 \examples{
 trials <- generate_phase1_trials(n = 10, seed = 1)
 nrow(trials)
+head(trials)
 }

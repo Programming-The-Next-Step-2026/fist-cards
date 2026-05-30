@@ -7,16 +7,18 @@
 find_card(colour, animal, number, cards = fist_cards())
 }
 \arguments{
-\item{colour, animal, number}{Card features.}
+\item{colour, animal, number}{Card features to match.}
 
 \item{cards}{A card metadata data frame, such as `fist_cards()`.}
 }
 \value{
-A one-row data frame.
+A one-row data frame when the card exists, or a zero-row data frame
+  when no card matches.
 }
 \description{
-Finds one card in a FIST card deck by its features.
+Finds one card in a FIST card deck by its colour, animal, and number.
 }
 \examples{
 find_card("blue", "frog", 1)
+find_card("yellow", "snail", 3)
 }

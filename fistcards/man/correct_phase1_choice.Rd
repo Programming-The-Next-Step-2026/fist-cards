@@ -7,21 +7,23 @@
 correct_phase1_choice(card1, card2, card3)
 }
 \arguments{
-\item{card1}{A named list with card features.}
+\item{card1}{A named list or one-row data frame for the first choice card.}
 
-\item{card2}{A named list with card features.}
+\item{card2}{A named list or one-row data frame for the second choice card.}
 
-\item{card3}{A named list with card features.}
+\item{card3}{A named list or one-row data frame for the target card.}
 }
 \value{
 `1` if `card1` matches `card3`, `2` if `card2` matches `card3`, or `NA` if neither card matches.
 }
 \description{
-Finds which of the first two cards shares exactly one feature with the third card.
+Finds which of the first two cards shares exactly one feature with the target
+card. A choice that shares zero features or multiple features is not treated
+as correct.
 }
 \examples{
-card1 <- list(colour = "red", animal = "frog", number = 1)
-card2 <- list(colour = "blue", animal = "snail", number = 2)
-card3 <- list(colour = "yellow", animal = "frog", number = 3)
-correct_phase1_choice(card1, card2, card3)
+matching_choice <- list(colour = "red", animal = "frog", number = 1)
+distractor_choice <- list(colour = "blue", animal = "snail", number = 2)
+target_card <- list(colour = "yellow", animal = "frog", number = 3)
+correct_phase1_choice(matching_choice, distractor_choice, target_card)
 }
