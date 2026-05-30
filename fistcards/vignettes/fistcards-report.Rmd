@@ -250,6 +250,109 @@ features with each other.
 This rule-based approach helps prevent invalid trials and keeps the Shiny app
 from relying on hand-coded answers.
 
+## Scenario
+
+The purpose of this scenario is to show how the `fistcards` Shiny app can be
+used to run one FIST card task session with a child participant and produce a
+downloadable data file for later analysis.
+
+The representative user is a developmental psychology researcher who wants to
+collect structured responses from a young child. In this example, the
+researcher is working with a 5-year-old participant in a quiet testing room. The
+researcher prepares the session, explains the task, and saves the data. The
+child participant interacts only with the card-choice screens by selecting the
+card they think is correct.
+
+The scenario assumes that the researcher has a computer with R, the required R
+packages, and a supported web browser installed. The `fistcards` package can be
+installed from GitHub or loaded from a local copy of the project. The computer
+also needs access to the packaged card images in `inst/app/www/cards`, which are
+included when the package is installed. No extra files need to be entered by the
+participant during the task.
+
+The package dependencies are:
+
+- `glue`: used for building text values in the package
+- `shiny`: used to run the interactive web app
+- `pkgload`: used by the vignette when loading a local package copy
+- `knitr` and `rmarkdown`: used to build this vignette/report
+- `shinytest2`: used for browser-based Shiny app tests
+- `testthat`: used for automated unit tests
+
+The example installation commands below also use `remotes` for installing from
+GitHub and `devtools` for loading or testing a local copy of the package.
+
+The interaction proceeds as follows:
+
+1. The researcher opens R and launches the app with `run_fist_game()`.
+2. The software opens the Shiny interface in a browser.
+3. The researcher enters an anonymous participant ID and chooses the number of
+   Phase 1 and Phase 2 trials.
+4. The software generates valid trials from the packaged card deck.
+5. The researcher starts the task and gives the child the instruction screen.
+6. In Phase 1, the child sees a target card and two possible answer cards. The
+   child clicks the answer card that goes with the target card.
+7. After each click, the software records the chosen card, whether the response
+   was correct, and the reaction time.
+8. In Phase 2, the child sees three cards and clicks the special card that
+   matches the other two cards in different ways.
+9. When all trials are complete, the software shows a thank-you screen.
+10. The researcher continues to the results screen, checks the score summary,
+    and downloads the response data as a CSV file.
+
+The main user input options are the participant ID, the number of trials in each
+phase, and the card choices made during the task. The main outputs are the
+on-screen score summary and the downloadable CSV file containing trial-level
+responses.
+
+## Flowchart
+
+The flowchart below separates the user steps from the software
+functions.
+
+```{r flowchart, echo = FALSE, fig.width = 7, fig.height = 7}
+old_mar <- par(mar = c(0, 0, 0, 0))
+plot.new()
+plot.window(xlim = c(0, 1), ylim = c(0, 1))
+
+draw_box <- function(x, y, label, fill) {
+  rect(x - 0.23, y - 0.035, x + 0.23, y + 0.035,
+       col = fill, border = "#333333", lwd = 1.2)
+  text(x, y, label, cex = 0.78)
+}
+
+draw_arrow <- function(x1, y1, x2, y2) {
+  arrows(x1, y1 - 0.04, x2, y2 + 0.04, length = 0.08, lwd = 1.1)
+}
+
+user_x <- 0.28
+software_x <- 0.72
+ys <- seq(0.9, 0.1, length.out = 8)
+
+text(user_x, 0.98, "User", font = 2, cex = 1.1)
+text(software_x, 0.98, "Software", font = 2, cex = 1.1)
+segments(0.5, 0.04, 0.5, 0.96, lty = 2, col = "#777777")
+
+draw_box(user_x, ys[1], "Launch app", "#f7fbff")
+draw_box(software_x, ys[2], "Open Shiny interface", "#f8fff7")
+draw_box(user_x, ys[3], "Enter ID and trial counts", "#f7fbff")
+draw_box(software_x, ys[4], "Generate valid trials", "#f8fff7")
+draw_box(user_x, ys[5], "Child selects cards", "#f7fbff")
+draw_box(software_x, ys[6], "Record choice, accuracy,\nand reaction time", "#f8fff7")
+draw_box(software_x, ys[7], "Show thank-you and\nresults summary", "#f8fff7")
+draw_box(user_x, ys[8], "Download CSV data", "#f7fbff")
+
+draw_arrow(user_x, ys[1], software_x, ys[2])
+draw_arrow(software_x, ys[2], user_x, ys[3])
+draw_arrow(user_x, ys[3], software_x, ys[4])
+draw_arrow(software_x, ys[4], user_x, ys[5])
+draw_arrow(user_x, ys[5], software_x, ys[6])
+draw_arrow(software_x, ys[6], software_x, ys[7])
+draw_arrow(software_x, ys[7], user_x, ys[8])
+
+par(old_mar)
+```
+
 ## Shiny app
 
 The interactive version can be launched from R:
@@ -359,9 +462,7 @@ devtools::test()
 
 ## Conclusion
 
-The final version of `fistcards` provides a reusable implementation of the FIST
-card task as an installable R package. It combines rule-based trial generation,
-tested scoring logic, a child-facing Shiny interface, packaged image stimuli,
-and downloadable response data. The project therefore moves the task from a
-static set of materials to a reproducible software tool that can be extended for
-future research use.
+The final version of `fistcards` provides an online version of the FIST
+card task as an installable R package. It contains rule-based trial generation,
+scoring logic, a child-facing Shiny interface, packaged image stimuli,
+and downloadable response data. 
