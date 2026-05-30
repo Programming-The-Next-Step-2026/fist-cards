@@ -1,6 +1,6 @@
-# FIST Cards
+# FIST-cards
 
-Online version containing Phase 1 and Phase 2 of the FIST card task for young
+Online version containing Phase 1 and Phase 2 of the FIST (Flexible Item Selection Task) card task for young
 children.
 
 The project is organized as an R package with a Shiny app. It includes helper
